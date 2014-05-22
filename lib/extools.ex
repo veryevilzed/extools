@@ -11,7 +11,7 @@ defmodule ExTools do
     @doc """
     Переводит Dict старого стиля в Map
     """
-    def to_map(dict), do: to_map(dict)
+    def to_map(dict), do: _to_map(dict)
 
     def bin_to_atom(bin) when is_atom(bin), do: bin
     def bin_to_atom(bin) when is_binary(bin), do: Kernel.binary_to_atom(bin)
