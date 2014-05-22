@@ -6,7 +6,7 @@ defmodule ExTools do
 
     defp _to_map(list) when is_list(list), do: list
 
-    defp _to_map(list), do: list
+    defp _to_map(list), do: Enum.map to_map(list)
 
     @doc """
     Переводит Dict старого стиля в Map
