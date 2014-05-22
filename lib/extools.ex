@@ -4,9 +4,9 @@ defmodule ExTools do
         [{k,v}|list] |> Enum.reduce %{}, fn({key, value}, acc) -> Dict.put acc, key, to_map(value); end
     end
 
-    defp _to_map(list) when is_list(list), do: list
+    defp _to_map(list) when is_list(list), do: list |> Enum.map &(_to_map(&1))
 
-    defp _to_map(list), do: list |> Enum.map &(_to_map(&1))
+    defp _to_map(item), do: item 
 
     @doc """
     Переводит Dict старого стиля в Map
