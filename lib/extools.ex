@@ -20,5 +20,11 @@ defmodule ExTools do
     """
     def dict_to_map(dict), do: to_map(toml)
 
+    def binary_to_atom(bin) when is_atom(bin), do: bin
+    def binary_to_atom(bin) when is_binary(bin), do: binary_to_atom(bin)
+
+    def binary_to_list(bin) when is_list(bin), do: bin
+    def binary_to_list(bin) when is_binary(bin), do: :erlang.binary_to_list(bin)
+
 
 end
