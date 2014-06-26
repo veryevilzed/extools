@@ -4,7 +4,7 @@ defmodule Extools.Mixfile do
   def project do
     [app: :extools,
      version: "0.0.1",
-     elixir: "~> 0.13.2",
+     elixir: "~> 0.14.0",
      deps: deps]
   end
 
