@@ -24,6 +24,14 @@ defmodule ExTools do
     def to_integet(v) when is_binary(v), do: Integer.parse(v) |> parse_res
     def to_integet(v) when is_float(v), do: Float.ceil v
 
+    def to_binary(v) when is_binary(v), do: v
+    def to_binary(v) when is_integer(v), do: "#{v}"
+    def to_binary(v) when is_atom(v), do: Atom.to_string v
+    def to_binary(v) when is_float(v), do: Float.to_string v
+    def to_binary(v) when is_list(v), do: "#{inspect v}"
+    def to_binary(v) when is_map(v), do: "#{inspect v}"
+
+
     def to_float(v) when is_float(v), do: v
     def to_float(v) when is_integer(v), do: v * 1.0
     def to_float(v) when is_binary(v), do: Float.parse(v) |> parse_res
