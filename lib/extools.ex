@@ -20,9 +20,9 @@ defmodule ExTools do
 
     defp parse_res({p, _}), do: p
 
-    def to_integet(v) when is_integer(v), do: v
-    def to_integet(v) when is_binary(v), do: Integer.parse(v) |> parse_res
-    def to_integet(v) when is_float(v), do: Float.ceil v
+    def to_integer(v) when is_integer(v), do: v
+    def to_integer(v) when is_binary(v), do: Integer.parse(v) |> parse_res
+    def to_integer(v) when is_float(v), do: Float.ceil v
 
     def to_binary(v) when is_binary(v), do: v
     def to_binary(v) when is_integer(v), do: "#{v}"
