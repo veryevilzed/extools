@@ -14,6 +14,10 @@ defmodule CoinsTest do
     assert Coins.to_integer( Coins.new(1.019) ) == 101
     assert Coins.to_integer( Coins.new(1.01999) ) == 101
 
+    assert Coins.to_integer( Coins.new(1234567.14) ) == 123456714
+    assert Coins.to_integer( Coins.new(1234567.149999) ) == 123456714
+    assert Coins.to_integer( Coins.new(1234567.140001) ) == 123456714
+
     assert Coins.to_integer( Coins.new("1") ) == 100
     assert Coins.to_integer( Coins.new("1.1") ) == 110
     assert Coins.to_integer( Coins.new("1.11") ) == 111
