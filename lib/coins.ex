@@ -1,7 +1,7 @@
 defmodule Coins do
     import Kernel, except: [div: 2, rem: 2]
 
-    defstruct [ val: 0 :: integer ]
+    defstruct [ val: 0 ]
     
     def new(), do: %Coins{}
     def new(val) when is_integer(val), do: %Coins{ val: val }
@@ -40,7 +40,7 @@ defmodule Coins do
     end
 
     defp get_sign(val) when val < 0, do: "-"
-    defp get_sign(val), do: ""
+    defp get_sign(_val), do: ""
     defp get_fract(val) do
         fract = Kernel.abs(Kernel.rem(val, 100))
         cond do
