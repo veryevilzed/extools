@@ -5,10 +5,8 @@ defmodule Coins do
     
     def new(), do: %Coins{}
     def new(val) when is_integer(val), do: %Coins{ val: val }
-    def new(val) when is_float(val) and val >= 0, 
-        do: %Coins{ val: Float.floor(Float.round(val * 100, 7)) }
     def new(val) when is_float(val), 
-        do: %Coins{ val: Float.ceil(Float.round(val * 100, 7)) }
+        do: new(:io_lib_format.fwrite_g(val) |> IO.iodata_to_binary)
     def new(val) when is_binary(val), do: parse_str_sign(val)
     def new(coins = %Coins{}), do: coins
 
