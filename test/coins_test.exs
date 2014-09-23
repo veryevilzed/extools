@@ -7,6 +7,13 @@ defmodule CoinsTest do
     assert Coins.to_integer( Coins.new(100) ) == 100
     assert Coins.to_integer( Coins.new(1000) ) == 1000
 
+    assert Coins.to_integer( Coins.new(1.0) ) == 100
+    assert Coins.to_integer( Coins.new(10.0) ) == 1000
+    assert Coins.to_integer( Coins.new(100.0) ) == 10000
+    assert Coins.to_integer( Coins.new(0.1) ) == 10
+    assert Coins.to_integer( Coins.new(0.01) ) == 1
+    assert Coins.to_integer( Coins.new(0.001) ) == 0
+
     assert Coins.to_integer( Coins.new(1.1) ) == 110
     assert Coins.to_integer( Coins.new(1.11) ) == 111
     assert Coins.to_integer( Coins.new(1.01) ) == 101
@@ -29,6 +36,10 @@ defmodule CoinsTest do
     assert Coins.to_integer( Coins.new("1.99") ) == 199
     assert Coins.to_integer( Coins.new("1.999") ) == 199
     assert Coins.to_integer( Coins.new("1.9999") ) == 199
+
+    assert Coins.to_integer( Coins.new("1.0e1") ) == 1000
+    assert Coins.to_integer( Coins.new("1.0e-1") ) == 10
+    assert Coins.to_integer( Coins.new("1.01e1") ) == 1010
   end
 
   test "negative representation" do
@@ -36,6 +47,13 @@ defmodule CoinsTest do
     assert Coins.to_integer( Coins.new(-10) ) == -10
     assert Coins.to_integer( Coins.new(-100) ) == -100
     assert Coins.to_integer( Coins.new(-1000) ) == -1000
+
+    assert Coins.to_integer( Coins.new(-1.0) ) == -100
+    assert Coins.to_integer( Coins.new(-10.0) ) == -1000
+    assert Coins.to_integer( Coins.new(-100.0) ) == -10000
+    assert Coins.to_integer( Coins.new(-0.1) ) == -10
+    assert Coins.to_integer( Coins.new(-0.01) ) == -1
+    assert Coins.to_integer( Coins.new(-0.001) ) == 0
 
     assert Coins.to_integer( Coins.new(-1.1) ) == -110
     assert Coins.to_integer( Coins.new(-1.11) ) == -111
