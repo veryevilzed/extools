@@ -33,7 +33,6 @@ defmodule Coins do
                     [fract] -> {padding_fract(fract), 2}
                     _ -> throw("Parse error")
                 end
-                IO.inspect {exp, whole, fract}
                 %Coins{ val: padding_exp(exp - 2, whole * 100 + fract) }
             _ -> throw("Parse error")
         end
