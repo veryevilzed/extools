@@ -8,6 +8,7 @@ defmodule Coins do
     def new(val) when is_float(val), 
         do: new(:io_lib_format.fwrite_g(val) |> IO.iodata_to_binary)
     def new(val) when is_binary(val), do: parse_str_sign(val)
+    def new(val) when is_list(val), do: parse_str_sign(List.to_string(val))
     def new(coins = %Coins{}), do: coins
 
     defp parse_str_sign("-" <> str), do: inverse( parse_str_sign(str) )
@@ -16,14 +17,41 @@ defmodule Coins do
         case Integer.parse(str) do
             {whole, ""} -> %Coins{ val: whole * 100 }
             {whole, "."} -> %Coins{ val: whole * 100 }
-            {whole, "." <> fract} -> 
-                case Integer.parse(String.slice(fract <> "0", 0, 2)) do
-                    {fract, ""} -> %Coins{ val: whole * 100 + fract }
+            {whole, "e" <> exp} -> 
+                case Integer.parse(exp) do
+                    {exp, ""} -> %Coins{ val: padding_exp(exp+2, whole) }
                     _ -> throw("Parse error")
-                end   
+                end
+                
+            {whole, "." <> sfract} -> 
+                {fract, exp} = case String.split(sfract, "e") do
+                    [fract, exp] -> 
+                        case Integer.parse(exp) do
+                            {exp, ""} -> {padding_fract(fract), exp + 2}
+                            _ -> throw("Parse error")
+                        end
+                    [fract] -> {padding_fract(fract), 2}
+                    _ -> throw("Parse error")
+                end
+                IO.inspect {exp, whole, fract}
+                %Coins{ val: padding_exp(exp - 2, whole * 100 + fract) }
             _ -> throw("Parse error")
         end
     end
+
+    defp padding_fract(fract) do
+        case {Integer.parse(String.slice(fract, 0..1)), String.length(fract)} do
+            {_, 0} -> 0
+            {{fract, ""}, 1} -> fract*10
+            {{fract, ""}, _} -> fract
+            _ -> throw("Parse error")
+        end
+    end
+
+    defp padding_exp(0, i), do: i
+    defp padding_exp(_, 0), do: 0
+    defp padding_exp(exp, i) when exp < 0, do: padding_exp(exp+1, Kernel.div(i,10))
+    defp padding_exp(exp, i), do: padding_exp(exp-1, i*10)
 
     defp inverse(%Coins{ val: val }) do
         %Coins{ val: -1 * val }
