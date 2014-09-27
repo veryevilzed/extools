@@ -11,6 +11,13 @@ defmodule Coins do
     def new(val) when is_list(val), do: parse_str_sign(List.to_string(val))
     def new(coins = %Coins{}), do: coins
 
+    def to_integer(%Coins{ val: val }), do: val
+    def to_string(%Coins{ val: val }), do: "#{get_sign(val)}#{Kernel.abs(Kernel.div(val, 100))}#{get_fract(val)}"
+    def to_float(coin = %Coins{ val: _ }) do 
+        {val, ""} = to_string(coin) |> Float.parse
+        val
+    end
+
     defp parse_str_sign("-" <> str), do: inverse( parse_str_sign(str) )
     defp parse_str_sign("+" <> str), do: parse_str_sign(str)
     defp parse_str_sign(str) do 
@@ -54,14 +61,6 @@ defmodule Coins do
 
     defp inverse(%Coins{ val: val }) do
         %Coins{ val: -1 * val }
-    end
-
-    def to_integer(%Coins{ val: val }) do
-        val
-    end
-
-    def to_string(%Coins{ val: val }) do
-        "#{get_sign(val)}#{Kernel.abs(Kernel.div(val, 100))}#{get_fract(val)}"
     end
 
     defp get_sign(val) when val < 0, do: "-"
