@@ -1,15 +1,18 @@
 defmodule Coins do
-    import Kernel, except: [div: 2, rem: 2]
+    import Kernel, except: [div: 2, rem: 2, to_string: 1]
 
     defstruct [ val: 0 ]
     
     def new(), do: %Coins{}
-    def new(val) when is_integer(val), do: %Coins{ val: val }
+    def new(val) when is_integer(val), do: %Coins{ val: val * 100 }
     def new(val) when is_float(val), 
         do: new(:io_lib_format.fwrite_g(val) |> IO.iodata_to_binary)
     def new(val) when is_binary(val), do: parse_str_sign(val)
     def new(val) when is_list(val), do: parse_str_sign(List.to_string(val))
     def new(coins = %Coins{}), do: coins
+
+    def as_coin(val) when is_integer(val), do: %Coins{ val: val }
+    def as_coin(val), do: new(val) |> Coins.div(100)
 
     def to_integer(%Coins{ val: val }), do: val
     def to_string(%Coins{ val: val }), do: "#{get_sign(val)}#{Kernel.abs(Kernel.div(val, 100))}#{get_fract(val)}"
