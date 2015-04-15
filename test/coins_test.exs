@@ -2,10 +2,10 @@ defmodule CoinsTest do
   use ExUnit.Case
 
   test "integer representation" do
-    assert Coins.to_integer( Coins.new(1) ) == 1
-    assert Coins.to_integer( Coins.new(10) ) == 10
-    assert Coins.to_integer( Coins.new(100) ) == 100
-    assert Coins.to_integer( Coins.new(1000) ) == 1000
+    assert Coins.to_integer( Coins.new(1) ) == 100
+    assert Coins.to_integer( Coins.new(10) ) == 1000
+    assert Coins.to_integer( Coins.new(100) ) == 10000
+    assert Coins.to_integer( Coins.new(1000) ) == 100000
 
     assert Coins.to_integer( Coins.new(1.0) ) == 100
     assert Coins.to_integer( Coins.new(10.0) ) == 1000
@@ -40,13 +40,17 @@ defmodule CoinsTest do
     assert Coins.to_integer( Coins.new("1.0e1") ) == 1000
     assert Coins.to_integer( Coins.new("1.0e-1") ) == 10
     assert Coins.to_integer( Coins.new("1.01e1") ) == 1010
+
+    assert Coins.to_integer( Coins.new("1.001e3") ) == 100100
+    assert Coins.to_integer( Coins.new("1.0001e3") ) == 100010
+    assert Coins.to_integer( Coins.new("1.001e-2") ) == 1
   end
 
   test "negative representation" do
-    assert Coins.to_integer( Coins.new(-1) ) == -1
-    assert Coins.to_integer( Coins.new(-10) ) == -10
-    assert Coins.to_integer( Coins.new(-100) ) == -100
-    assert Coins.to_integer( Coins.new(-1000) ) == -1000
+    assert Coins.to_integer( Coins.new(-1) ) == -100
+    assert Coins.to_integer( Coins.new(-10) ) == -1000
+    assert Coins.to_integer( Coins.new(-100) ) == -10000
+    assert Coins.to_integer( Coins.new(-1000) ) == -100000
 
     assert Coins.to_integer( Coins.new(-1.0) ) == -100
     assert Coins.to_integer( Coins.new(-10.0) ) == -1000
@@ -76,10 +80,10 @@ defmodule CoinsTest do
   end
 
   test "to string representation" do
-    assert Coins.to_string( Coins.new(1) ) == "0.01"
-    assert Coins.to_string( Coins.new(10) ) == "0.10"
-    assert Coins.to_string( Coins.new(100) ) == "1.00"
-    assert Coins.to_string( Coins.new(1000) ) == "10.00"
+    assert Coins.to_string( Coins.new(1) ) == "1.00"
+    assert Coins.to_string( Coins.new(10) ) == "10.00"
+    assert Coins.to_string( Coins.new(100) ) == "100.00"
+    assert Coins.to_string( Coins.new(1000) ) == "1000.00"
 
     assert Coins.to_string( Coins.new(1.1) ) == "1.10"
     assert Coins.to_string( Coins.new(1.11) ) == "1.11"
@@ -108,23 +112,18 @@ defmodule CoinsTest do
   test "operations" do
     assert Coins.add(Coins.new("1.11"), Coins.new("1.11")) == Coins.new("2.22")
     assert Coins.add(Coins.new("1.11"), Coins.new(1.11)) == Coins.new("2.22")
-    assert Coins.add(Coins.new("1.11"), Coins.new(111)) == Coins.new("2.22")
+    assert Coins.add(Coins.new("1.11"), Coins.new(111)) == Coins.new("112.11")
 
     assert Coins.sub(Coins.new("1.11"), Coins.new("1.11")) == Coins.new("0")
     assert Coins.sub(Coins.new("1.11"), Coins.new(1.11)) == Coins.new("0")
-    assert Coins.sub(Coins.new("1.11"), Coins.new(111)) == Coins.new("0")
+    assert Coins.sub(Coins.new("111"),  Coins.new(111)) == Coins.new("0")
 
     assert Coins.mul(Coins.new("1.11"), 2) == Coins.new("2.22")
-    assert Coins.mul(Coins.new("1.11"), 2.22) == Coins.new("246.42")
-    assert Coins.mul(Coins.new("1.11"), "2.22") == Coins.new("246.42")
 
     assert Coins.div(Coins.new("2.22"), 2) == Coins.new("1.11")
     assert Coins.div(Coins.new("3.33"), 2) == Coins.new("1.66")
-    assert Coins.div(Coins.new("3.33"), 3.33) == Coins.new(1)
 
-    assert Coins.rem(Coins.new("2.22"), 2.0) == Coins.new("0.22")
-    assert Coins.rem(Coins.new("2.22"), 2.2) == Coins.new("0.02")
-    assert Coins.rem(Coins.new("2.22"), 2.22) == Coins.new("0")
+    assert Coins.rem(Coins.new("2.22"), 2) == Coins.new("0.22")
   end
 
 end

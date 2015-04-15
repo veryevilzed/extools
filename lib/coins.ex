@@ -7,8 +7,8 @@ defmodule Coins do
     def new(val) when is_integer(val), do: %Coins{ val: val * 100 }
     def new(val) when is_float(val), 
         do: new(:io_lib_format.fwrite_g(val) |> IO.iodata_to_binary)
-    def new(val) when is_binary(val), do: parse_str_sign(val)
-    def new(val) when is_list(val), do: parse_str_sign(List.to_string(val))
+    def new(val) when is_binary(val), do: parse(val)
+    def new(val) when is_list(val), do: parse(List.to_string(val))
     def new(coins = %Coins{}), do: coins
 
     def as_coin(val) when is_integer(val), do: %Coins{ val: val }
@@ -19,51 +19,6 @@ defmodule Coins do
     def to_float(coin = %Coins{ val: _ }) do 
         {val, ""} = to_string(coin) |> Float.parse
         val
-    end
-
-    defp parse_str_sign("-" <> str), do: inverse( parse_str_sign(str) )
-    defp parse_str_sign("+" <> str), do: parse_str_sign(str)
-    defp parse_str_sign(str) do 
-        case Integer.parse(str) do
-            {whole, ""} -> %Coins{ val: whole * 100 }
-            {whole, "."} -> %Coins{ val: whole * 100 }
-            {whole, "e" <> exp} -> 
-                case Integer.parse(exp) do
-                    {exp, ""} -> %Coins{ val: padding_exp(exp+2, whole) }
-                    _ -> throw("Parse error")
-                end
-                
-            {whole, "." <> sfract} -> 
-                {fract, exp} = case String.split(sfract, "e") do
-                    [fract, exp] -> 
-                        case Integer.parse(exp) do
-                            {exp, ""} -> {padding_fract(fract), exp + 2}
-                            _ -> throw("Parse error")
-                        end
-                    [fract] -> {padding_fract(fract), 2}
-                    _ -> throw("Parse error")
-                end
-                %Coins{ val: padding_exp(exp - 2, whole * 100 + fract) }
-            _ -> throw("Parse error")
-        end
-    end
-
-    defp padding_fract(fract) do
-        case {Integer.parse(String.slice(fract, 0..1)), String.length(fract)} do
-            {_, 0} -> 0
-            {{fract, ""}, 1} -> fract*10
-            {{fract, ""}, _} -> fract
-            _ -> throw("Parse error")
-        end
-    end
-
-    defp padding_exp(0, i), do: i
-    defp padding_exp(_, 0), do: 0
-    defp padding_exp(exp, i) when exp < 0, do: padding_exp(exp+1, Kernel.div(i,10))
-    defp padding_exp(exp, i), do: padding_exp(exp-1, i*10)
-
-    defp inverse(%Coins{ val: val }) do
-        %Coins{ val: -1 * val }
     end
 
     defp get_sign(val) when val < 0, do: "-"
@@ -77,20 +32,86 @@ defmodule Coins do
         end        
     end 
 
+
+    defp parse("+" <> bin) do
+        String.downcase(bin) |> parse_unsign
+    end
+
+    defp parse("-" <> bin) do
+        num = String.downcase(bin) |> parse_unsign
+        %{num | val: -1 * num.val}
+    end
+
+    defp parse(bin) do
+        String.downcase(bin) |> parse_unsign
+    end
+
+    defp parse_unsign(bin) do
+        {int, rest} = parse_digits(bin)
+        {float, rest} = parse_float(rest)
+        {exp, rest} = parse_exp(rest)
+
+        if rest != "" or (int == [] and float == []) do
+          throw("Parse error")
+        else
+          if int == [], do: int = '0'
+          if exp == [], do: exp = '0'
+          %Coins{ val: padding(List.to_integer(int ++ float), List.to_integer(exp) - length(float) + 2) }
+        end
+    end
+
+    defp padding(i, 0), do: i
+    defp padding(i, p) when p > 0, do: padding(i*10, p-1)
+    defp padding(i, p) when p < 0, do: padding(Kernel.div(i,10), p+1)
+
+    defp parse_float("." <> rest), do: parse_digits(rest)
+    defp parse_float(bin), do: {[], bin}
+
+    defp parse_exp(<< ?e, rest :: binary >>) do
+        case rest do
+          << sign, rest :: binary >> when sign in [?+, ?-] ->
+            {digits, rest} = parse_digits(rest)
+            {[sign|digits], rest}
+          _ ->
+            parse_digits(rest)
+        end
+    end
+
+    defp parse_exp(bin) do
+        {[], bin}
+    end
+
+    defp parse_digits(bin), do: parse_digits(bin, [])
+
+    defp parse_digits(<< digit, rest :: binary >>, acc) when digit in ?0..?9 do
+        parse_digits(rest, [digit|acc])
+    end
+
+    defp parse_digits(rest, acc) do
+        {:lists.reverse(acc), rest}
+    end
+
+
+    def add(%Coins{ val: old }, %Coins{ val: val }) do
+        %Coins{ val: old + val }
+    end
     def add(%Coins{ val: old }, val) do
         new(old + new(val).val)
+    end
+    def sub(%Coins{ val: old }, %Coins{ val: val }) do
+        %Coins{ val: old - val }
     end
     def sub(%Coins{ val: old }, val) do
         new(old - new(val).val)
     end
-    def mul(%Coins{ val: old }, val) do
-        new(old * new(val).val)
+    def mul(old, val) do
+        new(Coins.to_float(old) * val)
     end
-    def div(%Coins{ val: old }, val) do
-        new(Kernel.div(old, new(val).val))
+    def div(old, val) do
+        as_coin(Kernel.div(Coins.to_integer(old), val))
     end
-    def rem(%Coins{ val: old }, val) do
-        new(Kernel.rem(old, new(val).val))
+    def rem(old, val) do
+        as_coin(Kernel.rem(Coins.to_integer(old), val*100))
     end
 end
 
